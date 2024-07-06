@@ -35,8 +35,8 @@ public class SecurityConfig {
                         .permitAll()
                 );
 
-        http
-                .csrf((auto) -> auto.disable());
+        //http
+        //        .csrf((auto) -> auto.disable());
 
         http
                 .sessionManagement((auth) -> auth
