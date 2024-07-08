@@ -14,42 +14,24 @@ public class SecurityConfig {
 
 
     @Bean
-    public BCryptPasswordEncoder bCryptPasswordEncoder(){
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-        return new BCryptPasswordEncoder();
-    }
+        http
+                .csrf((csrf) -> csrf.disable());
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws  Exception{
+        http
+                .formLogin((login) -> login.disable());
+
+        http
+                .httpBasic((basic) -> basic.disable());
+
+        http
+                .oauth2Login(Customizer.withDefaults());
 
         http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/", "/login", "/join", "/joinProcess").permitAll() //메인페이지, login화면에 모두 접근 가능
-                        .requestMatchers("/admin").hasRole("ADMIN") // ADMIN 권한이 있을때만 접근하도록
-                        .requestMatchers("/my/**").hasAnyRole("ADMIN", "USER") // 여러개의 권한이 있을때, 사용자 ID가 다를 수 있으므로 **와일드카드 사용
-                        .anyRequest().authenticated() //나머지 경우 로그인한 사용자만 가능하도록
-                );
-/*
-        http
-                .formLogin((auth) -> auth.loginPage("/login")
-                        .loginProcessingUrl("/loginProcess")
-                        .permitAll()
-                );
-*/
-        http
-                .httpBasic(Customizer.withDefaults());
-        //http
-        //        .csrf((auto) -> auto.disable());
-
-        http
-                .sessionManagement((auth) -> auth
-                        .maximumSessions(1)
-                        .maxSessionsPreventsLogin(true));
-
-        http
-                .sessionManagement((auth) -> auth
-                        .sessionFixation().changeSessionId());
-
+                        .requestMatchers("/", "/oauth2/**", "/login/**").permitAll()
+                        .anyRequest().authenticated());
 
         return http.build();
     }
